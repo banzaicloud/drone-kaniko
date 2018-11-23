@@ -20,8 +20,10 @@ DOCKERFILE=${PLUGIN_DOCKERFILE:-Dockerfile}
 DESTINATION=${PLUGIN_REPO}:${PLUGIN_TAGS:-latest}
 CONTEXT=${PLUGIN_CONTEXT:-$PWD}
 LOG=${PLUGIN_LOG:-info}
+BUILD_ARGS=`echo ${PLUGIN_BUILD_ARGS:-} | jq -r 'map("--build-arg " + .) | join(" ")'`
 
 /kaniko/executor -v ${LOG} \
     --context ${CONTEXT} \
     --dockerfile ${DOCKERFILE} \
-    --destination ${DESTINATION}
+    --destination ${DESTINATION} \
+    ${BUILD_ARGS}

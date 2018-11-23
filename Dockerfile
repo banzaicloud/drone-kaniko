@@ -1,4 +1,7 @@
-FROM gcr.io/kaniko-project/executor:v0.6.0 AS kaniko
+# TODO use the original image, but currently this is a blocker:
+# https://github.com/GoogleContainerTools/kaniko/pull/459
+FROM banzaicloud/kaniko:latest AS kaniko
+# FROM gcr.io/kaniko-project/executor:v0.6.0 AS kaniko
 
 FROM alpine:3.8
 
@@ -9,6 +12,8 @@ ENV USER /root
 ENV SSL_CERT_DIR=/kaniko/ssl/certs
 ENV DOCKER_CONFIG /kaniko/.docker/
 ENV DOCKER_CREDENTIAL_GCR_CONFIG /kaniko/.config/gcloud/docker_credential_gcr_config.json
+
+RUN apk add --update --no-cache jq
 
 # add the wrapper which acts as a drone plugin
 COPY plugin.sh /usr/bin/
