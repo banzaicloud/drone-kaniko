@@ -7,3 +7,6 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# kaniko base image cache files
+sha256:*
