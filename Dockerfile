@@ -1,7 +1,4 @@
-# TODO use the original image, but currently this is a blocker:
-# https://github.com/GoogleContainerTools/kaniko/pull/459
-FROM banzaicloud/kaniko:latest AS kaniko
-# FROM gcr.io/kaniko-project/executor:v0.6.0 AS kaniko
+FROM gcr.io/kaniko-project/executor:v0.7.0 AS kaniko
 
 FROM alpine:3.8
 
