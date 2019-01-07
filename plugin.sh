@@ -4,17 +4,21 @@ set -euo pipefail
 
 export PATH=$PATH:/kaniko/
 
-DOCKER_AUTH=`echo -n "${DOCKER_USERNAME}:${DOCKER_PASSWORD}" | base64`
+if [[ -n "${PLUGIN_USERNAME}" ]]; then
+    DOCKER_AUTH=`echo -n "${PLUGIN_USERNAME}:${PLUGIN_PASSWORD}" | base64`
 
-cat > /kaniko/.docker/config.json <<DOCKERJSON
+    REGISTRY=${PLUGIN_REGISTRY:-https://index.docker.io/v1/}
+
+    cat > /kaniko/.docker/config.json <<DOCKERJSON
 {
     "auths": {
-        "https://index.docker.io/v1/": {
+        "${REGISTRY}": {
             "auth": "${DOCKER_AUTH}"
         }
     }
 }
 DOCKERJSON
+fi
 
 DOCKERFILE=${PLUGIN_DOCKERFILE:-Dockerfile}
 DESTINATION=${PLUGIN_REPO}:${PLUGIN_TAGS:-latest}
