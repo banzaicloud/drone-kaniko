@@ -1,15 +1,14 @@
-#!/bin/sh
+#!/busybox/sh
 
 set -euo pipefail
 
 export PATH=$PATH:/kaniko/
 
-if [[ -n "${PLUGIN_USERNAME}" ]]; then
-    DOCKER_AUTH=`echo -n "${PLUGIN_USERNAME}:${PLUGIN_PASSWORD}" | base64`
+DOCKER_AUTH=`echo -n "${PLUGIN_USERNAME}:${PLUGIN_PASSWORD}" | base64`
 
-    REGISTRY=${PLUGIN_REGISTRY:-https://index.docker.io/v1/}
+REGISTRY=${PLUGIN_REGISTRY:-https://index.docker.io/v1/}
 
-    cat > /kaniko/.docker/config.json <<DOCKERJSON
+cat > /kaniko/.docker/config.json <<DOCKERJSON
 {
     "auths": {
         "${REGISTRY}": {
@@ -18,16 +17,23 @@ if [[ -n "${PLUGIN_USERNAME}" ]]; then
     }
 }
 DOCKERJSON
-fi
 
 DOCKERFILE=${PLUGIN_DOCKERFILE:-Dockerfile}
 DESTINATION=${PLUGIN_REPO}:${PLUGIN_TAGS:-latest}
 CONTEXT=${PLUGIN_CONTEXT:-$PWD}
 LOG=${PLUGIN_LOG:-info}
-BUILD_ARGS=`echo ${PLUGIN_BUILD_ARGS:-} | jq -r 'map("--build-arg " + .) | join(" ")'`
+case "${PLUGIN_CACHE:-}" in
+  true) CACHE="true" ;;
+     *) CACHE="false" ;;
+esac
+
+if [[ -n "${PLUGIN_BUILD_ARGS:-}" ]]; then
+    BUILD_ARGS=$(echo "${PLUGIN_BUILD_ARGS}" | tr ',' '\n' | while read build_arg; do echo "--build-arg=${build_arg}"; done)
+fi
 
 /kaniko/executor -v ${LOG} \
-    --context ${CONTEXT} \
-    --dockerfile ${DOCKERFILE} \
-    --destination ${DESTINATION} \
-    ${BUILD_ARGS}
+    --context=${CONTEXT} \
+    --dockerfile=${DOCKERFILE} \
+    --destination=${DESTINATION} \
+    --cache=${CACHE} \
+    ${BUILD_ARGS:-}
