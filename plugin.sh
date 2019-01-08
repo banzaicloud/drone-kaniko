@@ -22,6 +22,10 @@ DOCKERFILE=${PLUGIN_DOCKERFILE:-Dockerfile}
 CONTEXT=${PLUGIN_CONTEXT:-$PWD}
 LOG=${PLUGIN_LOG:-info}
 
+if [[ -n "${PLUGIN_TARGET:-}" ]]; then
+    TARGET="--target=${PLUGIN_TARGET}"
+fi
+
 if [[ "${PLUGIN_CACHE:-}" == "true" ]]; then
     CACHE="--cache=true"
 fi
@@ -41,4 +45,5 @@ fi
     --dockerfile=${DOCKERFILE} \
     ${DESTINATIONS} \
     ${CACHE:-} \
+    ${TARGET:-} \
     ${BUILD_ARGS:-}
