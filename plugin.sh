@@ -4,7 +4,7 @@ set -euo pipefail
 
 export PATH=$PATH:/kaniko/
 
-DOCKER_AUTH=`echo -n "${PLUGIN_USERNAME}:${PLUGIN_PASSWORD}" | base64`
+DOCKER_AUTH=`echo -n "${PLUGIN_USERNAME}:${PLUGIN_PASSWORD}" | base64 | tr -d "\n"`
 
 REGISTRY=${PLUGIN_REGISTRY:-https://index.docker.io/v1/}
 
