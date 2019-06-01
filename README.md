@@ -54,12 +54,12 @@ docker build -t banzaicloud/drone-kaniko .
 Warm up the alpine image to the cache:
 
 ```bash
-docker run -v $PWD:/cache gcr.io/kaniko-project/warmer:latest --image=alpine:3.8
+docker run -v $PWD:/cache gcr.io/kaniko-project/warmer:latest --verbosity=debug --image=alpine:3.8
 ```
 
 
-Run the builder on the host network to be able to access the registry:
+Run the builder on the host network to be able to access the registry and the local disk cache:
 
 ```bash
-docker run --net=host -it --rm -w /src -v $PWD:/cache -v $PWD:/src -e DOCKER_USERNAME=${DOCKER_USERNAME} -e DOCKER_PASSWORD=${DOCKER_PASSWORD} -e PLUGIN_REPO=banzaicloud/drone-kaniko-test -e PLUGIN_TAGS=test -e PLUGIN_DOCKERFILE=Dockerfile.test banzaicloud/drone-kaniko
+docker run --net=host -it --rm -w /src -v $PWD:/cache -v $PWD:/src -e PLUGIN_USERNAME=${DOCKER_USERNAME} -e PLUGIN_PASSWORD=${DOCKER_PASSWORD} -e PLUGIN_REPO=banzaicloud/drone-kaniko-test -e PLUGIN_TAGS=test -e PLUGIN_DOCKERFILE=Dockerfile.test -e PLUGIN_CACHE=true banzaicloud/drone-kaniko
 ```
