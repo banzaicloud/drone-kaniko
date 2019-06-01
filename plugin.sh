@@ -4,11 +4,12 @@ set -euo pipefail
 
 export PATH=$PATH:/kaniko/
 
-DOCKER_AUTH=`echo -n "${PLUGIN_USERNAME}:${PLUGIN_PASSWORD}" | base64 | tr -d "\n"`
+if [ "${PLUGIN_USERNAME:-}" ] || [ "${PLUGIN_PASSWORD:-}" ]; then
+    DOCKER_AUTH=`echo -n "${PLUGIN_USERNAME}:${PLUGIN_PASSWORD}" | base64 | tr -d "\n"`
 
-REGISTRY=${PLUGIN_REGISTRY:-https://index.docker.io/v1/}
+    REGISTRY=${PLUGIN_REGISTRY:-https://index.docker.io/v1/}
 
-cat > /kaniko/.docker/config.json <<DOCKERJSON
+    cat > /kaniko/.docker/config.json <<DOCKERJSON
 {
     "auths": {
         "${REGISTRY}": {
@@ -17,6 +18,12 @@ cat > /kaniko/.docker/config.json <<DOCKERJSON
     }
 }
 DOCKERJSON
+fi
+
+if [ "${PLUGIN_GOOGLE_APPLICATION_CREDENTIALS:-}" ];then
+    echo "${PLUGIN_GOOGLE_APPLICATION_CREDENTIALS}" > /kaniko/gcr.json
+    export GOOGLE_APPLICATION_CREDENTIALS=/kaniko/gcr.json
+fi
 
 DOCKERFILE=${PLUGIN_DOCKERFILE:-Dockerfile}
 CONTEXT=${PLUGIN_CONTEXT:-$PWD}
