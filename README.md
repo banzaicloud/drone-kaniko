@@ -12,7 +12,7 @@ steps:
 - name: publish
   image: banzaicloud/drone-kaniko
   settings:
-    registry: registry.example.com
+    registry: registry.example.com # if not provided index.docker.io is supposed
     repo: registry.example.com/example-project
     tags: ${DRONE_COMMIT_SHA}
     cache: true
@@ -35,10 +35,11 @@ steps:
 - name: publish
   image: banzaicloud/drone-kaniko
   settings:
-    repo: gcr.io/example.com/example-project
+    registry: gcr.io
+    repo: example.com/example-project
     tags: ${DRONE_COMMIT_SHA}
     cache: true
-    google_application_credentials:
+    json_key:
       from_secret: google-application-credentials
 ```
 
@@ -84,5 +85,5 @@ docker run --net=host -it --rm -w /src -v $PWD:/cache -v $PWD:/src -e PLUGIN_USE
 The very same example just pushing to GCR instead of Docker Hub:
 
 ```bash
-docker run --net=host -it --rm -w /src -v $PWD:/cache -v $PWD:/src -e PLUGIN_REPO=gcr.io/banzaicloud/drone-kaniko-test -e PLUGIN_TAGS=test -e PLUGIN_DOCKERFILE=Dockerfile.test -e PLUGIN_CACHE=true -e PLUGIN_GOOGLE_APPLICATION_CREDENTIALS="$(<$HOME/google-application-credentials.json)" banzaicloud/drone-kaniko
+docker run --net=host -it --rm -w /src -v $PWD:/cache -v $PWD:/src -e PLUGIN_REGISTRY=gcr.io -e PLUGIN_REPO=paas-dev1/drone-kaniko-test -e PLUGIN_TAGS=test -e PLUGIN_DOCKERFILE=Dockerfile.test -e PLUGIN_CACHE=true -e PLUGIN_JSON_KEY="$(<$HOME/google-application-credentials.json)" banzaicloud/drone-kaniko
 ```
