@@ -4,10 +4,10 @@ set -euo pipefail
 
 export PATH=$PATH:/kaniko/
 
+REGISTRY=${PLUGIN_REGISTRY:-index.docker.io}
+
 if [ "${PLUGIN_USERNAME:-}" ] || [ "${PLUGIN_PASSWORD:-}" ]; then
     DOCKER_AUTH=`echo -n "${PLUGIN_USERNAME}:${PLUGIN_PASSWORD}" | base64 | tr -d "\n"`
-
-    REGISTRY=${PLUGIN_REGISTRY:-https://index.docker.io/v1/}
 
     cat > /kaniko/.docker/config.json <<DOCKERJSON
 {
@@ -20,8 +20,8 @@ if [ "${PLUGIN_USERNAME:-}" ] || [ "${PLUGIN_PASSWORD:-}" ]; then
 DOCKERJSON
 fi
 
-if [ "${PLUGIN_GOOGLE_APPLICATION_CREDENTIALS:-}" ];then
-    echo "${PLUGIN_GOOGLE_APPLICATION_CREDENTIALS}" > /kaniko/gcr.json
+if [ "${PLUGIN_JSON_KEY:-}" ];then
+    echo "${PLUGIN_JSON_KEY}" > /kaniko/gcr.json
     export GOOGLE_APPLICATION_CREDENTIALS=/kaniko/gcr.json
 fi
 
@@ -42,7 +42,7 @@ if [ -n "${PLUGIN_BUILD_ARGS:-}" ]; then
 fi
 
 if [ -n "${PLUGIN_TAGS:-}" ]; then
-    DESTINATIONS=$(echo "${PLUGIN_TAGS}" | tr ',' '\n' | while read tag; do echo "--destination=${PLUGIN_REPO}:${tag} "; done)
+    DESTINATIONS=$(echo "${PLUGIN_TAGS}" | tr ',' '\n' | while read tag; do echo "--destination=${REGISTRY}/${PLUGIN_REPO}:${tag} "; done)
 else
     DESTINATIONS="--destination=${PLUGIN_REPO}:latest"
 fi
