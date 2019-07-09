@@ -43,8 +43,12 @@ fi
 
 if [ -n "${PLUGIN_TAGS:-}" ]; then
     DESTINATIONS=$(echo "${PLUGIN_TAGS}" | tr ',' '\n' | while read tag; do echo "--destination=${REGISTRY}/${PLUGIN_REPO}:${tag} "; done)
-else
+elif [ -n "${PLUGIN_REPO:-}" ]; then
     DESTINATIONS="--destination=${PLUGIN_REPO}:latest"
+else
+    DESTINATIONS="--no-push"
+    # Cache is not valid with --no-push
+    CACHE=""
 fi
 
 /kaniko/executor -v ${LOG} \
