@@ -48,6 +48,8 @@ fi
 
 if [ -n "${PLUGIN_TAGS:-}" ]; then
     DESTINATIONS=$(echo "${PLUGIN_TAGS}" | tr ',' '\n' | while read tag; do echo "--destination=${REGISTRY}/${PLUGIN_REPO}:${tag} "; done)
+elif [ -f .tags ]; then
+    DESTINATIONS=$(cat .tags| tr ',' '\n' | while read tag; do echo "--destination=${REGISTRY}/${PLUGIN_REPO}:${tag} "; done)
 elif [ -n "${PLUGIN_REPO:-}" ]; then
     DESTINATIONS="--destination=${PLUGIN_REPO}:latest"
 else
