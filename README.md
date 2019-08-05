@@ -44,6 +44,35 @@ steps:
       from_secret: google-application-credentials
 ```
 
+## Use `.tags` file for tagging
+
+Similarily to official
+[drone-docker](https://github.com/drone-plugins/drone-docker) plugin you can use
+`.tags` file to embed some custom logic for creating tags for an image.
+
+```yaml
+kind: pipeline
+name: default
+
+steps:
+- name: build
+  image: golang
+  commands:
+      - go get 
+      - go build
+      - make versiontags > .tags
+- name: publish
+  image: banzaicloud/drone-kaniko
+  settings:
+    registry: registry.example.com 
+    repo: registry.example.com/example-project
+    # tags: ${DRONE_COMMIT_SHA} <= it must be left undefined 
+    username:
+      from_secret: docker-username
+    password:
+      from_secret: docker-password
+```
+
 ## Test that it can build
 
 ```bash
