@@ -46,6 +46,14 @@ if [ -n "${PLUGIN_BUILD_ARGS:-}" ]; then
     BUILD_ARGS=$(echo "${PLUGIN_BUILD_ARGS}" | tr ',' '\n' | while read build_arg; do echo "--build-arg=${build_arg}"; done)
 fi
 
+if [ -n "${PLUGIN_BUILD_ARGS_FROM_ENV:-}" ]; then
+    BUILD_ARGS_FROM_ENV=$(echo "${PLUGIN_BUILD_ARGS_FROM_ENV}" | tr ',' '\n' | while read build_arg; do echo "--build-arg=${build_arg}=${!build_arg}"; done)
+fi
+
+echo "BUILD_ARGS_FROM_ENV"
+echo ${BUILD_ARGS_FROM_ENV:-}
+echo "BUILD_ARGS_FROM_ENV END"
+
 if [ -n "${PLUGIN_TAGS:-}" ]; then
     DESTINATIONS=$(echo "${PLUGIN_TAGS}" | tr ',' '\n' | while read tag; do echo "--destination=${REGISTRY}/${PLUGIN_REPO}:${tag} "; done)
 elif [ -f .tags ]; then
