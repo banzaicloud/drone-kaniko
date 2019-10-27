@@ -55,7 +55,7 @@ if [ -n "${PLUGIN_TAGS:-}" ]; then
 elif [ -f .tags ]; then
     DESTINATIONS=$(cat .tags| tr ',' '\n' | while read tag; do echo "--destination=${REGISTRY}/${PLUGIN_REPO}:${tag} "; done)
 elif [ -n "${PLUGIN_REPO:-}" ]; then
-    DESTINATIONS="--destination=${PLUGIN_REPO}:latest"
+    DESTINATIONS="--destination=${REGISTRY}/${PLUGIN_REPO}:latest"
 else
     DESTINATIONS="--no-push"
     # Cache is not valid with --no-push
