@@ -50,6 +50,30 @@ if [ -n "${PLUGIN_BUILD_ARGS_FROM_ENV:-}" ]; then
     BUILD_ARGS_FROM_ENV=$(echo "${PLUGIN_BUILD_ARGS_FROM_ENV}" | tr ',' '\n' | while read build_arg; do echo "--build-arg ${build_arg}=$(eval "echo \$$build_arg")"; done)
 fi
 
+# auto_tag, if set auto_tag: true, auto generate .tags file
+if [[ "${PLUGIN_AUTO_TAG:-}" == "true" ]]; then
+    # only support va.b.c and a.b.c
+    TAG=$(echo "${DRONE_TAG}" |sed 's/^v//g')
+    l=$(echo "${TAG}" |tr '.' '\n' |wc -l)
+    echo ${TAG} |grep -E "[a-z-]" &>/dev/null && r=0 || r=1
+
+	if [ ! -n "${TAG:-}" ];then
+		echo "latest" > .tags
+	elif [ ${r} -eq 0 -o ${l} -gt 3 ];then
+        echo "v${TAG},latest" > .tags
+    else
+        major=$(echo "${TAG}" |awk -F'.' '{print $1}')
+        minor=$(echo "${TAG}" |awk -F'.' '{print $2}')
+        release=$(echo "${TAG}" |awk -F'.' '{print $3}')
+    
+        major=${major:-0}
+        minor=${minor:-0}
+        release=${release:-0}
+    
+        echo "v${major},v${major}.${minor},v${major}.${minor}.${release},latest" > .tags
+    fi  
+fi
+
 if [ -n "${PLUGIN_TAGS:-}" ]; then
     DESTINATIONS=$(echo "${PLUGIN_TAGS}" | tr ',' '\n' | while read tag; do echo "--destination=${REGISTRY}/${PLUGIN_REPO}:${tag} "; done)
 elif [ -f .tags ]; then
