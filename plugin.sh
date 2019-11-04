@@ -51,16 +51,18 @@ if [ -n "${PLUGIN_BUILD_ARGS_FROM_ENV:-}" ]; then
 fi
 
 # auto_tag, if set auto_tag: true, auto generate .tags file
+# support format Major.Minor.Release or start with `v`
+# docker tags: Major, Major.Minor, Major.Minor.Release and latest
 if [[ "${PLUGIN_AUTO_TAG:-}" == "true" ]]; then
-    # only support va.b.c and a.b.c
-    TAG=$(echo "${DRONE_TAG}" |sed 's/^v//g')
-    l=$(echo "${TAG}" |tr '.' '\n' |wc -l)
-    echo ${TAG} |grep -E "[a-z-]" &>/dev/null && r=0 || r=1
+    TAG=$(echo "${DRONE_TAG:-}" |sed 's/^v//g')
+    part=$(echo "${TAG}" |tr '.' '\n' |wc -l)
+    # expect number
+    echo ${TAG} |grep -E "[a-z-]" &>/dev/null && isNum=1 || isNum=0
 
-	if [ ! -n "${TAG:-}" ];then
-		echo "latest" > .tags
-	elif [ ${r} -eq 0 -o ${l} -gt 3 ];then
-        echo "v${TAG},latest" > .tags
+    if [ ! -n "${TAG:-}" ];then
+        echo "latest" > .tags
+    elif [ ${isNum} -eq 1 -o ${part} -gt 3 ];then
+        echo "${TAG},latest" > .tags
     else
         major=$(echo "${TAG}" |awk -F'.' '{print $1}')
         minor=$(echo "${TAG}" |awk -F'.' '{print $2}')
@@ -70,7 +72,7 @@ if [[ "${PLUGIN_AUTO_TAG:-}" == "true" ]]; then
         minor=${minor:-0}
         release=${release:-0}
     
-        echo "v${major},v${major}.${minor},v${major}.${minor}.${release},latest" > .tags
+        echo "${major},${major}.${minor},${major}.${minor}.${release},latest" > .tags
     fi  
 fi
 
