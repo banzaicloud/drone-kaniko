@@ -73,6 +73,33 @@ steps:
       from_secret: docker-password
 ```
 
+## Auto tag
+
+Set `auto_tag: true`.
+
+```yaml
+kind: pipeline
+name: default
+
+steps:
+- name: build
+  image: golang
+  commands:
+      - go get 
+      - go build
+- name: publish
+  image: banzaicloud/drone-kaniko
+  settings:
+    registry: registry.example.com 
+    repo: registry.example.com/example-project
+    auto_tag: true # higher priority then .tags file
+    # tags: ${DRONE_COMMIT_SHA} <= it must be left undefined to use auto_tag
+    username:
+      from_secret: docker-username
+    password:
+      from_secret: docker-password
+```
+
 ## Test that it can build
 
 ```bash
