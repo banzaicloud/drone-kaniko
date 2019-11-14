@@ -25,6 +25,10 @@ fi
 if [ "${PLUGIN_AUTHJSON_GCR:-}" ];then
     echo "${PLUGIN_AUTHJSON_GCR}" > /kaniko/gcr.json
     export GOOGLE_APPLICATION_CREDENTIALS=/kaniko/gcr.json
+elif [ "${PLUGIN_JSON_KEY:-}" ];then
+# deprecated
+    echo "${PLUGIN_JSON_KEY}" > /kaniko/gcr.json
+    export GOOGLE_APPLICATION_CREDENTIALS=/kaniko/gcr.json
 fi
 
 if [ "${PLUGIN_AUTHJSON_AWS:-}" ];then
