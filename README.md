@@ -26,6 +26,24 @@ steps:
       from_secret: docker-password
 ```
 
+Pushing to private docker hub:
+
+```yaml
+kind: pipeline
+name: default
+
+steps:
+- name: publish
+  image: banzaicloud/drone-kaniko
+  settings:
+    registry: gcr.io
+    repo: example.com/example-project
+    tags: ${DRONE_COMMIT_SHA}
+    cache: true
+    authjson_docker:
+      from_secret: docker-config-json
+```
+
 Pushing to GCR:
 
 ```yaml
@@ -40,10 +58,27 @@ steps:
     repo: example.com/example-project
     tags: ${DRONE_COMMIT_SHA}
     cache: true
-    json_key:
+    authjson_gcr:
       from_secret: google-application-credentials
 ```
 
+Pushing to AWS:
+
+```yaml
+kind: pipeline
+name: default
+
+steps:
+- name: publish
+  image: banzaicloud/drone-kaniko
+  settings:
+    registry: gcr.io
+    repo: example.com/example-project
+    tags: ${DRONE_COMMIT_SHA}
+    cache: true
+    authjson_aws:
+      from_secret: aws-credential-json
+```
 ## Use `.tags` file for tagging
 
 Similarily to official
